@@ -17,6 +17,7 @@ spec:
       containers:
         - name: java-webapp
           image: yogi1433/java-app:latest # Replace with your image
+          imagePullPolicy: Always
           ports:
             - containerPort: 8080
 
