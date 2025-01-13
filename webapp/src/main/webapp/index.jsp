@@ -5,26 +5,32 @@
     <hr>
      
     <label for="Name"><b>Enter Full Name</b></label>
+    <br>
     <input type="text" placeholder="Enter Full Name" name="Name" id="Name" required>
     <br>
     
     <label for="mobile"><b>Enter mobile</b></label>
+    <br>
     <input type="text" placeholder="Enter moible number" name="mobile" id="mobile" required>
     <br>
 
     <label for="email"><b>Enter Email Address</b></label>
+    <br>
     <input type="text" placeholder="Enter Email Address" name="email" id="email" required>
     <br>
 
     <label for="psw"><b>Password</b></label>
+    <br>
     <input type="password" placeholder="Enter Password" name="psw" id="psw" required>
     <br>
 
     <label for="psw-repeat"><b>Repeat Password</b></label>
+    <br>
     <input type="password" placeholder="Repeat Password" name="psw-repeat" id="psw-repeat" required>
     <hr>
     <br>
     <p>By creating an account you agree to our <a href="#">Terms and Privacy</a>.</p>
+    <br>
     <button type="submit" class="registerbtn">Register</button>
   </div>
   <div class="container signin">
@@ -32,5 +38,5 @@
   </div>
 
    <h1> Thankyou, Happy Learning </h1>
-   <h1> auto,ation testing <h1>
+   <h1> automation testing <h1>
 </form>
