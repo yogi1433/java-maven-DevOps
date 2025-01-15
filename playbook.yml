@@ -1,0 +1,20 @@
+---
+- name: Build and Push Docker Image
+  hosts: localhost
+  become: true
+  vars:
+    docker_username: "username"
+    docker_image: "java-app"
+
+  tasks:
+    - name: Build the Docker image
+      ansible.builtin.shell: docker build -f "{{ workspace_path }}/Dockerfile" -t "{{ docker_image }}" "{{ workspace_path }}"
+      args:
+        chdir: "{{ workspace_path }}"
+
+    - name: Tag the Docker image
+      ansible.builtin.shell: docker tag "{{ docker_image }}" "{{ docker_username }}/{{ docker_image }}:latest"
+
+    - name: Push the Docker image
+      ansible.builtin.shell: docker push "{{ docker_username }}/{{ docker_image }}:latest"
+

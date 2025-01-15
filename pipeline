@@ -1,0 +1,76 @@
+pipeline {
+    agent any
+    environment {
+        PLAYBOOK_PATH = '/home/ansible/docker-playbook.yml'
+        KUBECONFIG = '/var/lib/jenkins/.kube/config'
+    }
+
+    stages {
+        stage('Checkout Code') {
+            steps {
+                echo "Checking out code from Git repository..."
+                git url: 'https://github.com/yogi1433/java-maven-DevOps.git', branch: 'master'
+            }
+        }
+
+        stage('Build with Maven') {
+            steps {
+                echo "Building Java application with Maven..."
+                sh 'mvn clean package -DskipTests'
+            }
+        }
+
+        stage('Build and Push Docker Image') {
+            steps {
+                echo "Executing Ansible playbook to build and push Docker image..."
+                sh "ansible-playbook ${PLAYBOOK_PATH} -e workspace_path=${env.WORKSPACE}"
+            }
+        }
+
+        stage('Set Kube Context') {
+            steps {
+                withCredentials([
+                    string(credentialsId: 'AWS_ACCESS_KEY_ID', variable: 'AWS_ACCESS_KEY_ID'),
+                    string(credentialsId: 'AWS_SECRET_ACCESS_KEY', variable: 'AWS_SECRET_ACCESS_KEY'),
+                    string(credentialsId: 'AWS_REGION', variable: 'AWS_REGION')
+                ]) {
+                    echo "Setting up Kubernetes context for EKS cluster..."
+                    sh '''
+                    aws eks update-kubeconfig --region $AWS_REGION --name eks-DevOps-cluster
+                    '''
+                }
+            }
+        }
+
+        stage('Deploy to Kubernetes') {
+            steps {
+                echo "Deploying application to Kubernetes..."
+                sh '''
+                export KUBECONFIG=/var/lib/jenkins/.kube/config
+                kubectl apply -f java-deploy.yml -f java-service.yml
+                '''
+            }
+        }
+        stage('Trigger Rolling Update') {
+            steps {
+                echo "Triggering rolling update to force Kubernetes to pull the latest image..."
+                sh '''
+                kubectl rollout restart deployment/java-webapp
+                '''
+            }
+        }
+    }
+
+    post {
+        always {
+            echo "Pipeline execution completed."
+        }
+        success {
+            echo "Pipeline executed successfully!"
+        }
+        failure {
+            echo "Pipeline execution failed. Please check the logs for details."
+        }
+    }
+}
+
